@@ -33,7 +33,7 @@ app.post('/github-webhook', async (req, res) => {
       const repositoryName = body.repository.full_name;
   
       console.log(`Received push event for repository: ${repositoryName}`);
-      const [username, userrepo] = repoFullName.split('/');
+      const [username, userrepo] = repositoryName.split('/');
       const user = await User.findOne({ username });
       if (!user) return console.error(`User with username ${username} not found`);
 
