@@ -42,13 +42,13 @@ app.post('/github-webhook', async (req, res) => {
 
       await Promise.all(projects.map(async project => {
         try {
-          const deployment = await fetch('http://localhost:4000/project/create-deployment', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectId: project.ProjectId })
-          });
-          if (!deployment.ok) throw new Error(`Failed to create deployment for project ${project.name}`);
-          console.log(`Deployment created for project: ${project.name}`);
+          // const deployment = await fetch('http://localhost:4000/project/create-deployment', {
+          //   method: "POST",
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ projectId: project.ProjectId })
+          // });
+          // if (!deployment.ok) throw new Error(`Failed to create deployment for project ${project.name}`);
+          console.log(`Deployment created for project: ${project.name} & project id of ${project.ProjectId} `);
         } catch (error) {
           console.error(`Error creating deployment for project: ${project.name}`, error);
         }
