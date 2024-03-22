@@ -3,11 +3,17 @@ const bodyParser=require("body-parser")
 const cors=require("cors")
 const app = express();
 const PORT = 5000;
+const dotenv = require("dotenv");
 
-
+const connectDB = require("./config/db");
 app.use(express.json());
 app.use(bodyParser.json())
 app.use(cors())
+
+dotenv.config();
+connectDB()
+const Project=require('./models/ProjectSchema')
+const User=require("./models/Userschema.js")
 
 
 
@@ -27,20 +33,27 @@ app.post('/github-webhook', async (req, res) => {
       const repositoryName = body.repository.full_name;
   
       console.log(`Received push event for repository: ${repositoryName}`);
-  
-      // Retrieve linked projects from your database based on the repository name
-      // const linkedProjects = await fetchLinkedProjects(repositoryName);
-  
-      // // Trigger deployment for each linked project
-      // await Promise.all(linkedProjects.map(async (project) => {
-      //   try {
-      //     await vercelAPI.deployProject(project); // Example function to deploy project using Vercel API
-      //     console.log(`Deployment triggered for project: ${project.name}`);
-      //   } catch (error) {
-      //     console.error(`Error deploying project ${project.name}:`, error);
-      //     // Handle deployment errors
-      //   }
-      // }));
+      const [username, userrepo] = repoFullName.split('/');
+      const user = await User.findOne({ username });
+      if (!user) return console.error(`User with username ${username} not found`);
+
+      const projects = await Project.find({ userId: user._id, reponame: userrepo });
+      if (!projects.length) return console.error(`No projects found for ${username}/${userrepo}`);
+
+      await Promise.all(projects.map(async project => {
+        try {
+          const deployment = await fetch('http://localhost:4000/project/create-deployment', {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId: project.ProjectId })
+          });
+          if (!deployment.ok) throw new Error(`Failed to create deployment for project ${project.name}`);
+          console.log(`Deployment created for project: ${project.name}`);
+        } catch (error) {
+          console.error(`Error creating deployment for project: ${project.name}`, error);
+        }
+      }));
+      
   
       return res.status(200).send('Webhook received successfully');
     } else {
