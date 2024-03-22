@@ -29,18 +29,18 @@ app.post('/github-webhook', async (req, res) => {
       console.log(`Received push event for repository: ${repositoryName}`);
   
       // Retrieve linked projects from your database based on the repository name
-      const linkedProjects = await fetchLinkedProjects(repositoryName);
+      // const linkedProjects = await fetchLinkedProjects(repositoryName);
   
-      // Trigger deployment for each linked project
-      await Promise.all(linkedProjects.map(async (project) => {
-        try {
-          await vercelAPI.deployProject(project); // Example function to deploy project using Vercel API
-          console.log(`Deployment triggered for project: ${project.name}`);
-        } catch (error) {
-          console.error(`Error deploying project ${project.name}:`, error);
-          // Handle deployment errors
-        }
-      }));
+      // // Trigger deployment for each linked project
+      // await Promise.all(linkedProjects.map(async (project) => {
+      //   try {
+      //     await vercelAPI.deployProject(project); // Example function to deploy project using Vercel API
+      //     console.log(`Deployment triggered for project: ${project.name}`);
+      //   } catch (error) {
+      //     console.error(`Error deploying project ${project.name}:`, error);
+      //     // Handle deployment errors
+      //   }
+      // }));
   
       return res.status(200).send('Webhook received successfully');
     } else {
